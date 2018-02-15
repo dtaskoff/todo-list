@@ -16,6 +16,8 @@ data Task = Task
   , status      :: Status
   } deriving (Generic, Show)
 
+type Tasks = [Task]
+
 data Status = TODO | Done
   deriving (Generic, Show)
 
