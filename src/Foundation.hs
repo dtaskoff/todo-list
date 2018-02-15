@@ -5,11 +5,11 @@
 module Foundation where
 
 import Control.Concurrent.MVar
-import Types
+import Task
 import Yesod.Core
 
 
-data App = App { tasks :: MVar [Task] }
+data App = App { tasks :: MVar Tasks }
 
 mkYesodData "App" $(parseRoutesFile "routes")
 
