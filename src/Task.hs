@@ -1,21 +1,28 @@
 module Task where
 
+import Control.Concurrent.MVar
 import Data.List (find)
 import Foundation
 import Types
 import Yesod.Core
 
 
+getTasksYesod :: Handler [Task]
+-- getTasksYesod = liftIO . readMVar =<< getsYesod tasks
+getTasksYesod = do
+  tasksMVar <- getsYesod tasks
+  liftIO $ readMVar tasksMVar
+
 getTaskR :: Handler Value
--- getTaskR = returnJson =<< getsYesod tasks
+-- getTaskR = returnJson =<< getTasksYesod
 getTaskR = do
-  tasks' <- getsYesod tasks
+  tasks' <- getTasksYesod
   returnJson tasks'
 
 getTaskIDR :: Int -> Handler Value
--- getTaskIDR i = maybe notFound returnJson . find ((== i) . tid) =<< getsYesod tasks
+-- getTaskIDR i = maybe notFound returnJson . find ((== i) . tid) =<< getTasksYesod
 getTaskIDR i = do
-  tasks' <- getsYesod tasks
+  tasks' <- getTasksYesod
   let mtask = find ((== i) . tid) tasks'
   maybe notFound returnJson mtask
 --  let mtask = find ((== i) . tid) tasks'

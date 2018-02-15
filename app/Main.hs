@@ -1,11 +1,15 @@
 import Application () -- for YesodDispatch instance
+import Control.Concurrent.MVar
 import Foundation
 import Types
 import Yesod.Core
 
 
 main :: IO ()
-main = warp 3000 $ App tasks'
+-- main = warp 3000 . App =<< newMVar tasks'
+main = do
+  tasksMVar <- newMVar tasks'
+  warp 3000 $ App tasksMVar
 
 tasks' :: [Task]
 tasks' =
