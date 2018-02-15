@@ -4,6 +4,12 @@ A simple RESTful application written during a Haskell workshop
 ## Setup
 If you haven't already, [install stack](https://haskell-lang.org/get-started)
 
+## Running
+The following command starts the application on port 3000:
+```sh
+stack build && stack exec todo-list
+```
+
 ## Application
 We'll manage tasks (in-memory) that have a title, a description and current status (todo and done).
 
