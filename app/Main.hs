@@ -4,16 +4,17 @@ import Foundation
 import Task
 import Yesod.Core
 
-main :: IO ()
-main = do
-  nextIndexMVar <- newMVar 3
-  tasksMVar <- newMVar tasks'
-  warp 3000 $ App nextIndexMVar tasksMVar
--- main = warp 3000 . app =<< newMVar tasks'
 
-tasks' :: [Task]
+main :: IO ()
+-- main = warp 3000 . App =<< newMVar tasks'
+main = do
+  tasksMVar <- newMVar tasks'
+  nextIndexMVar <- newMVar 3
+  warp 3000 $ App nextIndexMVar tasksMVar
+
+tasks' :: Tasks
 tasks' =
   [ Task 0 "Haskell Workshop Day 1" "Haskell Workshop" Done
-  , Task 1 "Haskell Workshop Day 2" "Haskell Workshop" InProgress
+  , Task 1 "Haskell Workshop Day 2" "Haskell Workshop" Done
   , Task 2 "Haskell Workshop Day 3" "Haskell Workshop" TODO
   ]

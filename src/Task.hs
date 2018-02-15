@@ -2,36 +2,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Task where
 
-import Data.Char (toLower)
+import Data.Text (toLower)
 import GHC.Generics
-import Yesod.Core
+import Yesod.Core.Json
 
-
-matchesID :: Int -> Task -> Bool
-matchesID i = (== i) . tid
-
-createTaskFromPOST :: TaskPOST -> Int -> Task
-createTaskFromPOST taskPOST i = Task
-  { tid = i
-  , title = titlePOST taskPOST
-  , description = descriptionPOST taskPOST
-  , status = maybe TODO id (statusPOST taskPOST)
-  }
-
-addTask :: Task -> Tasks -> Tasks
-addTask = (:)
-
-removeTask :: Int -> Tasks -> (Tasks, Maybe Task)
-removeTask id' tasks =
-  case break ((== id') . tid) tasks of
-    (tasks', []) -> (tasks', Nothing)
-    (tasks', t:ts) -> (tasks' ++ ts, Just t)
-
-updateTask :: Task -> TaskPUT -> Task
-updateTask task taskPUT = task
-  { title = maybe (title task) id (titlePUT taskPUT)
-  , description = maybe (description task) id (descriptionPUT taskPUT)
-  }
 
 {- The DeriveGeneric pragma, and "deriving Generic" below
  - are needed to avoid implementing the FromJSON and ToJSON
@@ -42,41 +16,36 @@ data Task = Task
   , title       :: String
   , description :: String
   , status      :: Status
-  } deriving (Generic)
-
-data TaskPOST = TaskPOST
-  { titlePOST       :: String
-  , descriptionPOST :: String
-  , statusPOST :: Maybe Status
   } deriving (Generic, Show)
 
-data TaskPUT = TaskPUT
-  { titlePUT       :: Maybe String
-  , descriptionPUT :: Maybe String
-  , statusPUT      :: Maybe Status
-  } deriving (Generic, Show)
+matchesID :: Int -> Task -> Bool
+matchesID i = (== i) . tid
 
 type Tasks = [Task]
 
-data Status = TODO | InProgress | Done
-  deriving (Generic, Read, Show)
+addTask :: Task -> Tasks -> Tasks
+addTask = (:)
+
+-- | Given an index `i` and Tasks gives a tuple with all Tasks without the first
+-- one having such an index and Just that Task, if such Task exists, else Nothing
+removeTask :: Int -> Tasks -> (Tasks, Maybe Task)
+removeTask i tasks =
+  case break (matchesID i) tasks of   -- ^ breaks the list of tasks into two halves
+    (ts, t:ts') -> (ts ++ ts', Just t) -- ^ where `t` is the first Task in the list that has an index `i`
+    (ts, []) -> (ts, Nothing)
+
+data Status = TODO | Done
+  deriving (Generic, Show)
 
 instance FromJSON Task
 instance ToJSON Task
 
-instance FromJSON TaskPOST
-instance ToJSON TaskPOST
-
-instance FromJSON TaskPUT
-instance ToJSON TaskPUT
-
--- | A custom FromJSON instance which is not case-sensitive
+-- | A custom FromJSON instance, which is not case-sensitive
 instance FromJSON Status where
-  parseJSON (Object v) = fmap mkStatus (v .: "status")
-    where mkStatus status =
-            case map toLower status of
-              "todo" -> TODO
-              "inprogress" -> InProgress
-              "done" -> Done
+  parseJSON (String s) = case toLower s of
+    "todo" -> pure TODO
+    "done" -> pure Done
+    _      -> fail "status"
+  parseJSON _ = fail "status"
 
 instance ToJSON Status

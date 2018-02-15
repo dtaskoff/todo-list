@@ -8,8 +8,6 @@ module Application where
 import Foundation
 import Yesod.Core
 
-import Add
-import Home
 import TaskHandlers
 
 mkYesodDispatch "App" resourcesApp
