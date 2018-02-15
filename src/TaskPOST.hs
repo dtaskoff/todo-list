@@ -17,7 +17,6 @@ data TaskPOST = TaskPOST
   } deriving Generic
 
 instance FromJSON TaskPOST
-instance ToJSON TaskPOST
 
 createTaskFromPOST :: Int -> TaskPOST -> Task
 createTaskFromPOST i taskPOST = Task

@@ -17,7 +17,6 @@ data TaskPUT = TaskPUT
   } deriving Generic
 
 instance FromJSON TaskPUT
-instance ToJSON TaskPUT
 
 -- | Change only these fields, which are not Nothing in taskPUT
 updateTask :: Task -> TaskPUT -> Task
