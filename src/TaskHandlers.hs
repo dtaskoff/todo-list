@@ -4,6 +4,8 @@ import Control.Concurrent.MVar
 import Data.List (find)
 import Foundation
 import Task
+import TaskPOST
+import TaskPUT
 import Yesod.Core
 
 
