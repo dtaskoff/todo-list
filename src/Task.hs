@@ -16,6 +16,19 @@ data Task = Task
   , status      :: Status
   } deriving (Generic, Show)
 
+matchesID :: Int -> Task -> Bool
+matchesID i = (== i) . tid
+
+type Tasks = [Task]
+
+-- | Change only these fields, which are not Nothing in taskPUT
+updateTask :: Task -> TaskPUT -> Task
+updateTask task taskPUT = task
+  { title = maybe (title task) id (titlePUT taskPUT)
+  , description = maybe (description task) id (descriptionPUT taskPUT)
+  , status = maybe TODO id (statusPUT taskPUT)
+  }
+
 -- | We're making this as a separate datatype for PUT requests, because we want to make sure
 -- that using `Task` will enforce setting all fields
 data TaskPUT = TaskPUT
@@ -23,11 +36,6 @@ data TaskPUT = TaskPUT
   , descriptionPUT :: Maybe String
   , statusPUT      :: Maybe Status
   } deriving Generic
-
-type Tasks = [Task]
-
-matchesID :: Int -> Task -> Bool
-matchesID i = (== i) . tid
 
 -- | Given an index `i` and Tasks gives a tuple with all Tasks without the first
 -- one having such an index and Just that Task, if such Task exists, else Nothing
