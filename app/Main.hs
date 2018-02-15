@@ -9,9 +9,10 @@ main :: IO ()
 -- main = warp 3000 . App =<< newMVar tasks'
 main = do
   tasksMVar <- newMVar tasks'
-  warp 3000 $ App tasksMVar
+  nextIndexMVar <- newMVar 2
+  warp 3000 $ App nextIndexMVar tasksMVar
 
-tasks' :: [Task]
+tasks' :: Tasks
 tasks' =
   [ Task 0 "Haskell Workshop Day 1" "Haskell Workshop" Done
   , Task 1 "Haskell Workshop Day 2" "Haskell Workshop" TODO

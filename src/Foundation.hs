@@ -9,7 +9,9 @@ import Task
 import Yesod.Core
 
 
-data App = App { tasks :: MVar Tasks }
+data App = App { nextIndex :: MVar Int
+               , tasks :: MVar Tasks
+               }
 
 mkYesodData "App" $(parseRoutesFile "routes")
 
