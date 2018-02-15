@@ -10,6 +10,6 @@ import Yesod.Core
 
 import Add
 import Home
-import Task
+import TaskHandlers
 
 mkYesodDispatch "App" resourcesApp
