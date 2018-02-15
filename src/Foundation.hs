@@ -4,13 +4,9 @@
 {-# LANGUAGE ViewPatterns      #-}
 module Foundation where
 
-import Control.Concurrent.MVar
-import Task
 import Yesod.Core
 
-data App = App { nextIndex :: MVar Int
-               , tasks :: MVar [Task]
-               }
+data App = App
 
 mkYesodData "App" $(parseRoutesFile "routes")
 
