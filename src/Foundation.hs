@@ -8,7 +8,9 @@ import Control.Concurrent.MVar
 import Task
 import Yesod.Core
 
-data App = App { tasks :: MVar [Task] }
+data App = App { nextIndex :: MVar Int
+               , tasks :: MVar [Task]
+               }
 
 mkYesodData "App" $(parseRoutesFile "routes")
 

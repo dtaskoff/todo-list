@@ -1,4 +1,4 @@
 /              HomeR   GET
 /add/#Int/#Int AddR    GET
 /task          TaskR   GET POST
-/task/#Int     TaskIDR GET DELETE
+/task/#Int     TaskIDR GET DELETE PUT
