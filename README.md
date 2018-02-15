@@ -20,19 +20,34 @@ REST API:
 * PUT    /task/:id - update a task and return it
 * DELETE /task/:id - remove a task and return it
 
-The returned tasks are in the [following JSON format](./workshop.json)
+The returned tasks are in the following JSON format:
 
-The same format is used for `POST` and `PUT` methods, but the field *done* is optional when `POST`ing and all fields are optional when `PUT`ting.
+```json
+{
+  "tid":0,
+  "title":"Haskell Workshop",
+  "description":"Run a Haskell Workshop",
+  "status":"todo"
+}
+```
+
+The same format (omitting *tid*) is used for `POST` and `PUT` methods, but the field *status* is optional when `POST`ing and all fields are optional when `PUT`ting.
+
+
+--------------------------
+
+Currently, handlers for all methods mentioned above are implemented.
+They can be tested with:
+```sh
+curl localhost:3000/task # GET /task
+curl localhost:3000/task/0 # GET /task/0
+curl localhost:3000/task -d @workshop.json # POST /task
+curl localhost:3000/task/0 -X PUT -d @workshop.json # PUT /task/0
+curl localhost:3000/task/0 -X DELETE # /DELETE /task/0
+```
+You can use this [workshop.json](./workshop.json).
 
 Possible extensions:
 * place the tasks in different todo lists
 * use a database
 * add users
-
---------------------------
-
-Currently only the POST method is implemented (partially).
-It can be tested with:
-```sh
-curl localhost:3000/task -d @workshop.json
-```
