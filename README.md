@@ -33,6 +33,15 @@ The returned tasks are in the following JSON format:
 
 The same format (omitting *tid*) is used for `POST` and `PUT` methods, but the field *status* is optional when `POST`ing and all fields are optional when `PUT`ting.
 
+
+--------------------------
+
+Currently only the POST method is implemented (partially).
+It can be tested with:
+```sh
+curl localhost:3000/task -d @[workshop.json](./workshop.json)
+```
+
 Possible extensions:
 * place the tasks in different todo lists
 * use a database
