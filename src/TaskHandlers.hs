@@ -29,6 +29,12 @@ getTaskIDR i = do
 --    Just task -> returnJson task
 --    Nothing   -> notFound
 
+-- | Returns the next index and updates it (increments it by one)
+getNextIndex :: Handler Int
+getNextIndex = do
+  nextIndexMVar <- getsYesod nextIndex
+  liftIO $ modifyMVar nextIndexMVar (\i -> pure (i + 1, i))
+
 deleteTaskIDR :: Int -> Handler Value
 deleteTaskIDR i = do
   tasksMVar <- getsYesod tasks
@@ -38,10 +44,15 @@ deleteTaskIDR i = do
 -- | A simple handler, that just outputs in the console the JSON body of the POST request
 -- Note: requireJsonBody succeeds only if the passed JSON is correct, e.g. matches the
 -- FromJSON instance for Task
-postTaskR :: Handler ()
+postTaskR :: Handler Value
 postTaskR = do
-  task <- requireJsonBody
-  liftIO $ print (task :: Task)
+  taskPOST <- requireJsonBody
+  i <- getNextIndex
+  let task = createTaskFromPOST i taskPOST
+
+  tasksMVar <- getsYesod tasks
+  liftIO $ modifyMVar_ tasksMVar (pure . addTask task)
+  returnJson task
 
 putTaskIDR :: Int -> Handler Value
 putTaskIDR i = do
