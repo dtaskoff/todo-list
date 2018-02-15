@@ -16,6 +16,14 @@ data Task = Task
   , status      :: Status
   } deriving (Generic, Show)
 
+-- | We're making this as a separate datatype for PUT requests, because we want to make sure
+-- that using `Task` will enforce setting all fields
+data TaskPUT = TaskPUT
+  { titlePUT       :: Maybe String
+  , descriptionPUT :: Maybe String
+  , statusPUT      :: Maybe Status
+  } deriving Generic
+
 type Tasks = [Task]
 
 matchesID :: Int -> Task -> Bool
@@ -34,6 +42,9 @@ data Status = TODO | Done
 
 instance FromJSON Task
 instance ToJSON Task
+
+instance FromJSON TaskPUT
+instance ToJSON TaskPUT
 
 instance FromJSON Status
 instance ToJSON Status
