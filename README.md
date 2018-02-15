@@ -1,6 +1,11 @@
 # todo-list
 A simple RESTful application written during a Haskell workshop
 
+## Progress
+[Day 1](https://github.com/leohaskell/todo-list/releases/tag/end-of-day1)
+
+[Day 2](https://github.com/leohaskell/todo-list/releases/tag/end-of-day2)
+
 ## Setup
 If you haven't already, [install stack](https://haskell-lang.org/get-started)
 
