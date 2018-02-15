@@ -1,9 +1,11 @@
 module TaskHandlers where
 
 import Control.Concurrent.MVar
+import Control.Monad
 import Data.List (find)
 import Foundation
 import Task
+import Text.Read (readMaybe)
 import Yesod.Core
 
 
@@ -19,16 +21,28 @@ getTaskR = do
   tasks' <- getTasksYesod
   returnJson tasks'
 
+postTaskR :: Handler Value
+postTaskR = do
+  task <- requireJsonBody
+  nextIndexMVar <- getsYesod nextIndex
+  id' <- liftIO $ modifyMVar nextIndexMVar (\i -> pure (i + 1, i))
+
+  let task' = createTaskFromPOST task id'
+
+  tasks' <- getsYesod tasks
+  tasks'' <- liftIO $ modifyMVar_ tasks' (pure . addTask task')
+  returnJson tasks''
+
 getTaskIDR :: Int -> Handler Value
 getTaskIDR id' = do
   tasks' <- getTasksYesod
-  let mtask = find ((== id') . tid) tasks'
+  let mtask = find (matchesID id') tasks'
   maybe notFound returnJson mtask
 
---  let tasks'' = find ((= id') . tid) tasks'
---  let findTask = find ((== id') . tid)
---  let findTask tasks' = find ((== id') . tid) tasks'
---  let findTask = \tasks' -> find ((== id') . tid) tasks'
+--  let tasks'' = find (matchesID id') tasks'
+--  let findTask = find (matchesID id')
+--  let findTask tasks' = find (matchesID id') tasks'
+--  let findTask = \tasks' -> find (matchesID id') tasks'
 --  case findTask tasks' of
 
 deleteTaskIDR :: Int -> Handler Value
@@ -37,12 +51,16 @@ deleteTaskIDR id' = do
   mtask <- liftIO $ modifyMVar tasks' (pure . removeTask id')
   maybe notFound returnJson mtask
 
-postTaskR :: Handler Value
-postTaskR = do
-  task <- requireJsonBody
-  let taskStatus = maybe TODO id (statusPOST task)
-      task' = undefined
+putTaskIDR :: Int -> Handler Value
+putTaskIDR id' = do
+  tasksMVar <- getsYesod tasks
+  tasks' <- liftIO $ readMVar tasksMVar
 
-  tasks' <- getsYesod tasks
-  tasks'' <- liftIO $ modifyMVar_ tasks' (pure . addTask task')
-  returnJson tasks''
+  case find (matchesID id') tasks' of
+    Nothing -> notFound
+    Just task -> do
+      task' <- requireJsonBody
+      let task'' = updateTask task task'
+      liftIO $ modifyMVar_ tasksMVar $
+        pure . addTask task'' . fst . removeTask id'
+      returnJson task
