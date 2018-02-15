@@ -48,6 +48,22 @@ removeTask i tasks =
     (ts, t:ts') -> (ts ++ ts', Just t) -- ^ where `t` is the first Task in the list that has an index `i`
     (ts, []) -> (ts, Nothing)
 
+-- | We're making this as a separate datatype for POST requests, because we want to make sure
+-- that using `Task` will enforce setting all fields
+data TaskPOST = TaskPOST
+  { titlePOST       :: String
+  , descriptionPOST :: String
+  , statusPOST      :: Maybe Status
+  } deriving Generic
+
+createTaskFromPOST :: Int -> TaskPOST -> Task
+createTaskFromPOST i taskPOST = Task
+  { tid = i
+  , title = titlePOST taskPOST
+  , description = descriptionPOST taskPOST
+  , status = maybe TODO id (statusPOST taskPOST)
+  }
+
 data Status = TODO | Done
   deriving (Generic, Show)
 
@@ -56,6 +72,9 @@ instance ToJSON Task
 
 instance FromJSON TaskPUT
 instance ToJSON TaskPUT
+
+instance FromJSON TaskPOST
+instance ToJSON TaskPOST
 
 instance FromJSON Status
 instance ToJSON Status
