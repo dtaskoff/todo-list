@@ -29,6 +29,9 @@ updateTask task taskPUT = task
   , status = maybe TODO id (statusPUT taskPUT)
   }
 
+addTask :: Task -> Tasks -> Tasks
+addTask = (:)
+
 -- | We're making this as a separate datatype for PUT requests, because we want to make sure
 -- that using `Task` will enforce setting all fields
 data TaskPUT = TaskPUT

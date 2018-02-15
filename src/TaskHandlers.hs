@@ -25,16 +25,14 @@ getTaskIDR i = do
   tasks' <- getTasksYesod
   let mtask = find (matchesID i) tasks'
   maybe notFound returnJson mtask
---  let mtask = find (matchesID i) tasks'
 --  case mtask of
 --    Just task -> returnJson task
 --    Nothing   -> notFound
 
 deleteTaskIDR :: Int -> Handler Value
--- deleteTaskIDR i = do
 deleteTaskIDR i = do
-  tasks' <- getsYesod tasks
-  mtask <- liftIO $ modifyMVar tasks' (pure . removeTask i)
+  tasksMVar <- getsYesod tasks
+  mtask <- liftIO $ modifyMVar tasksMVar (pure . removeTask i)
   maybe notFound returnJson mtask
 
 -- | A simple handler, that just outputs in the console the JSON body of the POST request
@@ -44,3 +42,20 @@ postTaskR :: Handler ()
 postTaskR = do
   task <- requireJsonBody
   liftIO $ print (task :: Task)
+
+putTaskIDR :: Int -> Handler Value
+putTaskIDR i = do
+  tasks' <- getTasksYesod
+
+  case find (matchesID i) tasks' of
+    Nothing -> notFound
+    Just task -> do
+      taskPUT <- requireJsonBody
+      tasksMVar <- getsYesod tasks
+
+      liftIO $ modifyMVar_ tasksMVar $
+        pure . addTask (updateTask task taskPUT) . fst . removeTask i
+        -- ^ updating a task is the same as removing it and then inserting the updated version of it
+        -- (not really efficient, though)
+
+      returnJson task
