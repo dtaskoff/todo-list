@@ -21,11 +21,11 @@ The returned tasks are in the following JSON format:
   "tid":0,
   "title":"Haskell Workshop",
   "description":"Run a Haskell Workshop",
-  "done":false
+  "status":"todo"
 }
 ```
 
-The same format is used for `POST` and `PUT` methods, but the field *done* is optional when `POST`ing and all fields are optional when `PUT`ting.
+The same format (omitting *tid*) is used for `POST` and `PUT` methods, but the field *status* is optional when `POST`ing and all fields are optional when `PUT`ting.
 
 Possible extensions:
 * place the tasks in different todo lists
