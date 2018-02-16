@@ -2,11 +2,10 @@
 module TaskPOST where
 
 import GHC.Generics
-import Task (Task(Task), Status(..))
+import Status
+import Task
 import Yesod.Core.Json
 
-import qualified Task as T
--- ^ because Task exports title, description and status
 
 -- | We're making this as a separate datatype for POST requests, because we want to make sure
 -- that using `Task` will enforce setting all fields
@@ -20,8 +19,8 @@ instance FromJSON TaskPOST
 
 createTaskFromPOST :: Int -> TaskPOST -> Task
 createTaskFromPOST i taskPOST = Task
-  { T.tid = i
-  , T.title = title taskPOST
-  , T.description = description taskPOST
-  , T.status = maybe TODO id (status taskPOST)
+  { taskTid = i
+  , taskTitle = title taskPOST
+  , taskDescription = description taskPOST
+  , taskStatus = maybe TODO id (status taskPOST)
   }

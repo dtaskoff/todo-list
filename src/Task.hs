@@ -1,25 +1,29 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
 module Task where
 
-import Data.Text (toLower)
-import GHC.Generics
-import Yesod.Core.Json
+import Database.Persist.TH
+import Status
 
 
-{- The DeriveGeneric pragma, and "deriving Generic" below
- - are needed to avoid implementing the FromJSON and ToJSON
- - instances ourselves
- -}
-data Task = Task
-  { tid         :: Int
-  , title       :: String
-  , description :: String
-  , status      :: Status
-  } deriving (Generic, Show)
+-- | Define a Task datatype and a schema for our database
+share [mkPersist sqlSettings, mkMigrate "migrateAll"]
+      [persistLowerCase|
+Task json
+  tid         Int
+  title       String
+  description String
+  status      Status
+|]
 
 matchesID :: Int -> Task -> Bool
-matchesID i = (== i) . tid
+matchesID i = (== i) . taskTid
 
 type Tasks = [Task]
 
@@ -33,19 +37,3 @@ removeTask i tasks =
   case break (matchesID i) tasks of   -- ^ breaks the list of tasks into two halves
     (ts, t:ts') -> (ts ++ ts', Just t) -- ^ where `t` is the first Task in the list that has an index `i`
     (ts, []) -> (ts, Nothing)
-
-data Status = TODO | Done
-  deriving (Generic, Show)
-
-instance FromJSON Task
-instance ToJSON Task
-
--- | A custom FromJSON instance, which is not case-sensitive
-instance FromJSON Status where
-  parseJSON (String s) = case toLower s of
-    "todo" -> pure TODO
-    "done" -> pure Done
-    _      -> fail "status"
-  parseJSON _ = fail "status"
-
-instance ToJSON Status
