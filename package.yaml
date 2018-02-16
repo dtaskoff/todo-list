@@ -10,6 +10,8 @@ dependencies:
 # defined below is just a thin wrapper.
 library:
   source-dirs: src
+  dependencies:
+  - persistent-template
 
 # Runnable executable for our application
 executables:

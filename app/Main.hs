@@ -1,6 +1,7 @@
 import Application () -- for YesodDispatch instance
 import Control.Concurrent.MVar
 import Foundation
+import Status
 import Task
 import Yesod.Core
 
