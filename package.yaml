@@ -12,6 +12,7 @@ dependencies:
 library:
   source-dirs: src
   dependencies:
+  - persistent
   - persistent-template
   - yesod-persistent
 
