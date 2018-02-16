@@ -3,8 +3,9 @@ version: "0.0.0"
 
 dependencies:
 - base
-- yesod-core
 - text
+- yesod-core
+- persistent-sqlite
 
 # The library contains all of our application code. The executable
 # defined below is just a thin wrapper.
@@ -12,6 +13,7 @@ library:
   source-dirs: src
   dependencies:
   - persistent-template
+  - yesod-persistent
 
 # Runnable executable for our application
 executables:
@@ -24,3 +26,5 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - todo-list
+    - monad-logger
+    - resourcet
