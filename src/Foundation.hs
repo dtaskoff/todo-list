@@ -5,17 +5,26 @@
 module Foundation where
 
 import Control.Concurrent.MVar
+import Database.Persist.Sqlite
 import Task
 import Yesod.Core
+import Yesod.Persist
 
 
-data App = App { nextIndex :: MVar Int
+data App = App { dbPool :: ConnectionPool
+               , nextIndex :: MVar Int
                , tasks :: MVar Tasks
                }
 
 mkYesodData "App" $(parseRoutesFile "routes")
 
 instance Yesod App
+
+instance YesodPersist App where
+  type YesodPersistBackend App = SqlBackend
+  runDB action = do
+    pool <- getsYesod dbPool
+    runSqlPool action pool
 
 getTasksYesod :: Handler Tasks
 -- getTasksYesod = liftIO . readMVar =<< getsYesod tasks
