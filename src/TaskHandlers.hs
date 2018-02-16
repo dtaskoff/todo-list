@@ -1,19 +1,21 @@
 module TaskHandlers where
 
 import Control.Concurrent.MVar
+import Database.Persist
 import Data.List (find)
 import Foundation
 import Task
 import TaskPOST
 import TaskPUT
 import Yesod.Core
+import Yesod.Persist
 
 
 getTaskR :: Handler Value
--- getTaskR = returnJson =<< getTasksYesod
 getTaskR = do
-  tasks' <- getTasksYesod
-  returnJson tasks'
+  tasks' <- runDB $ selectList [] []
+  returnJson $ map entityTaskToTask (tasks' :: [Entity Task])
+    where entityTaskToTask (Entity key task) = task
 
 -- | A simple handler, that just outputs in the console the JSON body of the POST request
 -- Note: requireJsonBody succeeds only if the passed JSON is correct, e.g. matches the
