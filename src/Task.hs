@@ -10,6 +10,7 @@ module Task where
 
 import Database.Persist.TH
 import Status
+import Yesod.Persist
 
 
 -- | Define a Task datatype and a schema for our database
@@ -21,6 +22,10 @@ Task json
   description String
   status      Status
 |]
+
+
+entityTaskToTask :: Entity Task -> Task
+entityTaskToTask (Entity key task) = task
 
 matchesID :: Int -> Task -> Bool
 matchesID i = (== i) . taskTid

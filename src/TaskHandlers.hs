@@ -15,7 +15,6 @@ getTaskR :: Handler Value
 getTaskR = do
   tasks' <- runDB $ selectList [] []
   returnJson $ map entityTaskToTask (tasks' :: [Entity Task])
-    where entityTaskToTask (Entity key task) = task
 
 -- | A simple handler, that just outputs in the console the JSON body of the POST request
 -- Note: requireJsonBody succeeds only if the passed JSON is correct, e.g. matches the
@@ -31,14 +30,12 @@ postTaskR = do
   returnJson task
 
 getTaskIDR :: Int -> Handler Value
--- getTaskIDR i = maybe notFound returnJson . find (matchesID i) =<< getTasksYesod
 getTaskIDR i = do
-  tasks' <- getTasksYesod
-  let mtask = find (matchesID i) tasks'
-  maybe notFound returnJson mtask
---  case mtask of
---    Just task -> returnJson task
---    Nothing   -> notFound
+  tasks' <- runDB $ selectList [TaskTid ==. i] []
+  let mtask = case tasks' of
+        x:_ -> Just x
+        _ -> Nothing
+  maybe notFound (returnJson . entityTaskToTask) mtask
 
 deleteTaskIDR :: Int -> Handler Value
 deleteTaskIDR i = do
