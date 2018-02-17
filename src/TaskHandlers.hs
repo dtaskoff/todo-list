@@ -4,11 +4,13 @@ import Control.Concurrent.MVar
 import Database.Persist
 import Data.List (find)
 import Foundation
+import Network.HTTP.Types.Status (internalServerError500)
 import Task
 import TaskGET
 import TaskPOST
 import TaskPUT
 import Yesod.Core
+import Yesod.Core.Handler
 import Yesod.Persist
 
 
@@ -27,7 +29,8 @@ postTaskR = do
     k <- insert $ taskPOSTToTask taskPOST
     mt <- get k
     pure (k, mt)
-  maybe notFound (returnJson . taskToTaskGET key) mtask
+  maybe (sendResponseStatus internalServerError500 "")
+        (returnJson . taskToTaskGET key) mtask
 
 getTaskIDR :: TaskKey -> Handler Value
 getTaskIDR key = do

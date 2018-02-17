@@ -15,6 +15,7 @@ library:
   - persistent
   - persistent-template
   - yesod-persistent
+  - http-types
 
 # Runnable executable for our application
 executables:
