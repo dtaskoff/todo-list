@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 module TaskPUT where
 
+import Database.Persist
 import GHC.Generics
 import Status
 import Task
@@ -17,10 +18,9 @@ data TaskPUT = TaskPUT
 
 instance FromJSON TaskPUT
 
--- | Change only these fields, which are not Nothing in taskPUT
-updateTask :: Task -> TaskPUT -> Task
-updateTask task taskPUT = task
-  { taskTitle = maybe (taskTitle task) id (title taskPUT)
-  , taskDescription = maybe (taskDescription task) id (description taskPUT)
-  , taskStatus = maybe TODO id (status taskPUT)
-  }
+-- | Update only these fields, which are not Nothing in taskPUT
+taskPUTToUpdates :: TaskPUT -> [Update Task]
+taskPUTToUpdates taskPUT =
+  maybe [] (\t -> [TaskTitle =. t]) (title taskPUT) ++
+  maybe [] (\d -> [TaskDescription =. d]) (description taskPUT) ++
+  maybe [] (\s -> [TaskStatus =. s]) (status taskPUT)

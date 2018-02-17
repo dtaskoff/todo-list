@@ -41,17 +41,13 @@ deleteTaskIDR i = do
 
 putTaskIDR :: Int -> Handler Value
 putTaskIDR i = do
-  tasks' <- getTasksYesod
+  taskPUT <- requireJsonBody
+  mtask <- runDB $ do
+    mentity <- getBy $ TaskID i
+    case mentity of
+      Nothing -> pure Nothing
+      Just (Entity key value) -> do
+        update key $ taskPUTToUpdates taskPUT
+        pure $ Just value
 
-  case find (matchesID i) tasks' of
-    Nothing -> notFound
-    Just task -> do
-      taskPUT <- requireJsonBody
-      tasksMVar <- getsYesod tasks
-
-      liftIO $ modifyMVar_ tasksMVar $
-        pure . addTask (updateTask task taskPUT) . fst . removeTask i
-        -- ^ updating a task is the same as removing it and then inserting the updated version of it
-        -- (not really efficient, though)
-
-      returnJson task
+  maybe notFound returnJson mtask
