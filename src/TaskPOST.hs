@@ -17,8 +17,8 @@ data TaskPOST = TaskPOST
 
 instance FromJSON TaskPOST
 
-createTaskFromPOST :: Int -> TaskPOST -> Task
-createTaskFromPOST i taskPOST = Task
+taskPOSTToTask :: Int -> TaskPOST -> Task
+taskPOSTToTask i taskPOST = Task
   { taskTid = i
   , taskTitle = title taskPOST
   , taskDescription = description taskPOST

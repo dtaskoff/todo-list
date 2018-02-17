@@ -16,17 +16,14 @@ getTaskR = do
   tasks' <- runDB $ selectList [] []
   returnJson $ map entityTaskToTask (tasks' :: [Entity Task])
 
--- | A simple handler, that just outputs in the console the JSON body of the POST request
 -- Note: requireJsonBody succeeds only if the passed JSON is correct, e.g. matches the
 -- FromJSON instance for Task
 postTaskR :: Handler Value
 postTaskR = do
   taskPOST <- requireJsonBody
   i <- getNextIndex
-  let task = createTaskFromPOST i taskPOST
-
-  tasksMVar <- getsYesod tasks
-  liftIO $ modifyMVar_ tasksMVar (pure . addTask task)
+  let task = taskPOSTToTask i taskPOST
+  runDB $ insert task
   returnJson task
 
 getTaskIDR :: Int -> Handler Value
