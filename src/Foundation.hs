@@ -13,7 +13,6 @@ import Yesod.Persist
 
 data App = App { dbPool :: ConnectionPool
                , nextIndex :: MVar Int
-               , tasks :: MVar Tasks
                }
 
 mkYesodData "App" $(parseRoutesFile "routes")
@@ -25,12 +24,6 @@ instance YesodPersist App where
   runDB action = do
     pool <- getsYesod dbPool
     runSqlPool action pool
-
-getTasksYesod :: Handler Tasks
--- getTasksYesod = liftIO . readMVar =<< getsYesod tasks
-getTasksYesod = do
-  tasksMVar <- getsYesod tasks
-  liftIO $ readMVar tasksMVar
 
 -- | Returns the next index and updates it (increments it by one)
 getNextIndex :: Handler Int
