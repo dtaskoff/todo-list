@@ -46,8 +46,7 @@ putTaskIDR :: TaskKey -> Handler Value
 putTaskIDR key = do
   taskPUT <- requireJsonBody
   mtask <- runDB $ do
-    mentity <- get key
     update key $ taskPUTToUpdates taskPUT
-    pure mentity
+    get key
 
   maybe notFound (returnJson . taskToTaskGET key) mtask
