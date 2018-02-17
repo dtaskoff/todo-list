@@ -36,8 +36,10 @@ getTaskIDR i = do
 
 deleteTaskIDR :: Int -> Handler Value
 deleteTaskIDR i = do
-  tasksMVar <- getsYesod tasks
-  mtask <- liftIO $ modifyMVar tasksMVar (pure . removeTask i)
+  mtask <- runDB $ do
+    res <- getBy $ TaskID i
+    deleteBy $ TaskID i
+    pure res
   maybe notFound returnJson mtask
 
 putTaskIDR :: Int -> Handler Value
