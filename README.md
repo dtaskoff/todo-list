@@ -6,6 +6,8 @@ A simple RESTful application written during a Haskell workshop
 
 [Day 2](https://github.com/leohaskell/todo-list/releases/tag/end-of-day2)
 
+[Day 3](https://github.com/leohaskell/todo-list/releases/tag/end-of-day3)
+
 ## Setup
 If you haven't already, [install stack](https://haskell-lang.org/get-started)
 
