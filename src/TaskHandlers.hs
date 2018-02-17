@@ -31,10 +31,7 @@ postTaskR = do
 
 getTaskIDR :: Int -> Handler Value
 getTaskIDR i = do
-  tasks' <- runDB $ selectList [TaskTid ==. i] []
-  let mtask = case tasks' of
-        x:_ -> Just x
-        _ -> Nothing
+  mtask <- runDB $ getBy $ TaskID i
   maybe notFound (returnJson . entityTaskToTask) mtask
 
 deleteTaskIDR :: Int -> Handler Value

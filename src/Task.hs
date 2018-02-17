@@ -21,6 +21,7 @@ Task json
   title       String
   description String
   status      Status
+  TaskID     tid
 |]
 
 
