@@ -5,6 +5,7 @@ import Database.Persist
 import Data.List (find)
 import Foundation
 import Task
+import TaskGET
 import TaskPOST
 import TaskPUT
 import Yesod.Core
@@ -14,40 +15,39 @@ import Yesod.Persist
 getTaskR :: Handler Value
 getTaskR = do
   tasks' <- runDB $ selectList [] []
-  returnJson $ map entityTaskToTask (tasks' :: [Entity Task])
+  returnJson $
+    map (\(Entity key task) -> taskToTaskGET key task) tasks'
 
 -- Note: requireJsonBody succeeds only if the passed JSON is correct, e.g. matches the
 -- FromJSON instance for Task
 postTaskR :: Handler Value
 postTaskR = do
   taskPOST <- requireJsonBody
-  i <- getNextIndex
-  let task = taskPOSTToTask i taskPOST
-  runDB $ insert task
-  returnJson task
+  (key, mtask) <- runDB $ do
+    k <- insert $ taskPOSTToTask taskPOST
+    mt <- get k
+    pure (k, mt)
+  maybe notFound (returnJson . taskToTaskGET key) mtask
 
-getTaskIDR :: Int -> Handler Value
-getTaskIDR i = do
-  mtask <- runDB $ getBy $ TaskID i
-  maybe notFound (returnJson . entityTaskToTask) mtask
+getTaskIDR :: TaskKey -> Handler Value
+getTaskIDR key = do
+  mtask <- runDB $ get key
+  maybe notFound (returnJson . taskToTaskGET key) mtask
 
-deleteTaskIDR :: Int -> Handler Value
-deleteTaskIDR i = do
+deleteTaskIDR :: TaskKey -> Handler Value
+deleteTaskIDR key = do
   mtask <- runDB $ do
-    res <- getBy $ TaskID i
-    deleteBy $ TaskID i
+    res <- get key
+    delete key
     pure res
-  maybe notFound returnJson mtask
+  maybe notFound (returnJson . taskToTaskGET key) mtask
 
-putTaskIDR :: Int -> Handler Value
-putTaskIDR i = do
+putTaskIDR :: TaskKey -> Handler Value
+putTaskIDR key = do
   taskPUT <- requireJsonBody
   mtask <- runDB $ do
-    mentity <- getBy $ TaskID i
-    case mentity of
-      Nothing -> pure Nothing
-      Just (Entity key value) -> do
-        update key $ taskPUTToUpdates taskPUT
-        pure $ Just value
+    mentity <- get key
+    update key $ taskPUTToUpdates taskPUT
+    pure mentity
 
-  maybe notFound returnJson mtask
+  maybe notFound (returnJson . taskToTaskGET key) mtask

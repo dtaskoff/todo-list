@@ -17,10 +17,9 @@ data TaskPOST = TaskPOST
 
 instance FromJSON TaskPOST
 
-taskPOSTToTask :: Int -> TaskPOST -> Task
-taskPOSTToTask i taskPOST = Task
-  { taskTid = i
-  , taskTitle = title taskPOST
+taskPOSTToTask :: TaskPOST -> Task
+taskPOSTToTask taskPOST = Task
+  { taskTitle = title taskPOST
   , taskDescription = description taskPOST
   , taskStatus = maybe TODO id (status taskPOST)
   }
