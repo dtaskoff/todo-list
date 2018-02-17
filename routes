@@ -1,2 +1,2 @@
-/task      TaskR   GET POST
-/task/#Int TaskIDR GET DELETE PUT
+/task          TaskR   GET POST
+/task/#TaskKey TaskIDR GET DELETE PUT

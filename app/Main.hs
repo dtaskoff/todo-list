@@ -10,9 +10,9 @@ import Yesod.Core
 
 
 main :: IO ()
-main = do
-  nextIndexMVar <- newMVar 0
-  runStderrLoggingT $
-    withSqlitePool "todo-list.db3" 42 $ \pool -> liftIO $ do
-      runResourceT $ flip runSqlPool pool $ runMigration migrateAll
-      warp 3000 $ App pool nextIndexMVar
+main = runStderrLoggingT $
+  withSqlitePool "todo-list.db3" 42 $
+    \pool -> liftIO $ do
+      runResourceT $ flip runSqlPool pool $
+        runMigration migrateAll
+      warp 3000 $ App pool
