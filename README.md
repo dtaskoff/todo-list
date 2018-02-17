@@ -42,17 +42,8 @@ The same format (omitting *tid*) is used for `POST` and `PUT` methods, but the f
 --------------------------
 
 Currently, handlers for all methods mentioned above are implemented.
-They can be tested with:
-```sh
-curl localhost:3000/task # GET /task
-curl localhost:3000/task/0 # GET /task/0
-curl localhost:3000/task -d @workshop.json # POST /task
-curl localhost:3000/task/0 -X PUT -d @workshop.json # PUT /task/0
-curl localhost:3000/task/0 -X DELETE # /DELETE /task/0
-```
-You can use this [workshop.json](./workshop.json).
+They can be tested with [`sh test.sh`](./test.sh) (you'll need [jq](https://stedolan.github.io/jq/) to run them)
 
 Possible extensions:
 * place the tasks in different todo lists
-* use a database
 * add users
